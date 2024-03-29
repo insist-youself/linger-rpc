@@ -1,0 +1,4 @@
+jdk=com.linger.linrpc.serializer.JdkSerializer
+hessian=com.linger.linrpc.serializer.HessianSerializer
+json=com.linger.linrpc.serializer.JsonSerializer
+kryo=com.linger.linrpc.serializer.KryoSerializer

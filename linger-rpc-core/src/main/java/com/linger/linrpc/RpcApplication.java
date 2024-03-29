@@ -1,7 +1,10 @@
 package com.linger.linrpc;
 
+import com.linger.linrpc.config.RegistryConfig;
 import com.linger.linrpc.config.RpcConfig;
 import com.linger.linrpc.constant.RpcConstant;
+import com.linger.linrpc.registry.Registry;
+import com.linger.linrpc.registry.RegistryFactory;
 import com.linger.linrpc.utils.ConfigUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,6 +26,11 @@ public class RpcApplication {
     public static void  init(RpcConfig newRpcConfig) {
         rpcConfig = newRpcConfig;
         log.info("rpc init, config = {}", newRpcConfig.toString());
+        // 初始化注册中心
+        RegistryConfig registryConfig = rpcConfig.getRegistryConfig();
+        Registry registry = RegistryFactory.getInstance(registryConfig.getRegistry());
+        registry.init(registryConfig);
+        log.info("register init, config = {}", registryConfig);
     }
 
     /**

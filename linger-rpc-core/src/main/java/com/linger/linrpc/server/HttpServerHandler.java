@@ -1,10 +1,12 @@
 package com.linger.linrpc.server;
 
+import com.linger.linrpc.RpcApplication;
 import com.linger.linrpc.model.RpcRequest;
 import com.linger.linrpc.model.RpcResponse;
 import com.linger.linrpc.registry.LocalRegistry;
 import com.linger.linrpc.serializer.JdkSerializer;
 import com.linger.linrpc.serializer.Serializer;
+import com.linger.linrpc.serializer.SerializerFactory;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
@@ -23,7 +25,8 @@ public class HttpServerHandler implements Handler<HttpServerRequest> {
     @Override
     public void handle(HttpServerRequest request) {
         // 指定序列化器
-        final Serializer serializer = new JdkSerializer();
+        final Serializer serializer =
+                SerializerFactory.getInstance(RpcApplication.getRpcConfig().getSerializer());
 
         //记录日志
         System.out.println("Received request: " + request.method() + " " + request.uri());

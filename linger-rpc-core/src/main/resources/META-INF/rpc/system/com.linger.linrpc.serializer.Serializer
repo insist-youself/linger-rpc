@@ -1,0 +1,2 @@
+a=com.linger.linrpc.serializer.JdkSerializer
+b=com.linger.linrpc.serializer.HessianSerializer

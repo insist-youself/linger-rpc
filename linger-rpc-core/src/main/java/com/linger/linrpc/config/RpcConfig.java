@@ -1,5 +1,6 @@
 package com.linger.linrpc.config;
 
+import com.linger.linrpc.serializer.SerializerKeys;
 import lombok.Data;
 
 /**
@@ -29,5 +30,20 @@ public class RpcConfig {
     /**
      * 端口号
      */
-    private Integer serverPort = 8080;
+    private Integer serverPort = 8081;
+
+    /**
+     * 模拟调用
+     */
+    private boolean mock = false;
+
+    /**
+     * 注册中心配置
+     */
+    private RegistryConfig registryConfig = new RegistryConfig();
+
+    /**
+     * 序列化器
+     */
+    private String serializer = SerializerKeys.JDK;
 }

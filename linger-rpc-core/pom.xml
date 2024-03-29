@@ -16,6 +16,12 @@
   </properties>
 
   <dependencies>
+    <!-- zookeeper -->
+    <dependency>
+      <groupId>org.apache.curator</groupId>
+      <artifactId>curator-x-discovery</artifactId>
+      <version>5.6.0</version>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/io.etcd/jetcd-core -->
     <dependency>
       <groupId>io.etcd</groupId>

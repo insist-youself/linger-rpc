@@ -17,6 +17,7 @@ public class RegistryFactory {
      * 默认注册中心
      */
     public static final Registry DEFAULT_REGISTRY = new EtcdRegistry();
+    //public static final Registry DEFAULT_REGISTRY = new ZooKeeperRegistry();
 
     /**
      * 获取实例

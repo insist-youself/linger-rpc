@@ -1,1 +1,2 @@
 etcd=com.linger.linrpc.registry.EtcdRegistry
+zookeeper=com.linger.linrpc.registry.ZooKeeperRegistry

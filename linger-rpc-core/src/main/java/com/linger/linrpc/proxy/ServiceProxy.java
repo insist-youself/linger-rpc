@@ -1,6 +1,7 @@
 package com.linger.linrpc.proxy;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.linger.linrpc.RpcApplication;
@@ -9,19 +10,27 @@ import com.linger.linrpc.constant.RpcConstant;
 import com.linger.linrpc.model.RpcRequest;
 import com.linger.linrpc.model.RpcResponse;
 import com.linger.linrpc.model.ServiceMetaInfo;
+import com.linger.linrpc.protocol.*;
 import com.linger.linrpc.registry.Registry;
 import com.linger.linrpc.registry.RegistryFactory;
 import com.linger.linrpc.serializer.JdkSerializer;
 import com.linger.linrpc.serializer.Serializer;
 import com.linger.linrpc.serializer.SerializerFactory;
+import com.linger.linrpc.server.tcp.VertxTcpClient;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.net.NetClient;
+import io.vertx.core.net.NetSocket;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 服务代理 (JDK 动态代理 )
+ *
  * @author linger
  * @date 2024/3/21 22:02
  */
@@ -58,23 +67,32 @@ public class ServiceProxy implements InvocationHandler {
             serviceMetaInfo.setServiceName(serviceName);
             serviceMetaInfo.setServiceVersion(RpcConstant.DEFAULT_SERVICE_VERSION);
             List<ServiceMetaInfo> serviceMetaInfoList = registry.serviceDiscovery(serviceMetaInfo.getServiceKey());
-            if (CollUtil.isEmpty(serviceMetaInfoList)){
+            if (CollUtil.isEmpty(serviceMetaInfoList)) {
                 throw new RuntimeException("暂无服务地址");
             }
             // 暂时先取第一个
-            ServiceMetaInfo seletedServiceMetaInfo = serviceMetaInfoList.get(0);
+            ServiceMetaInfo selectedServiceMetaInfo = serviceMetaInfoList.get(0);
 
-            try (HttpResponse httpResponse = HttpRequest.post(seletedServiceMetaInfo.getServiceAddress())
-                         .body(bodyBytes)
-                         .execute()) {
-                byte[] result = httpResponse.bodyBytes();
-                // 反序列化
-                RpcResponse rpcResponse = serializer.deserialize(result, RpcResponse.class);
-                return rpcResponse.getData();
-            }
+            // 发送 TCP 请求
+            RpcResponse rpcResponse = VertxTcpClient
+                    .doRequest(rpcRequest, selectedServiceMetaInfo);
+            return rpcResponse.getData();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+//            try (HttpResponse httpResponse = HttpRequest.post(seletedServiceMetaInfo.getServiceAddress())
+//                         .body(bodyBytes)
+//                         .execute()) {
+//                byte[] result = httpResponse.bodyBytes();
+//                // 反序列化
+//                RpcResponse rpcResponse = serializer.deserialize(result, RpcResponse.class);
+//                return rpcResponse.getData();
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
     }
 }

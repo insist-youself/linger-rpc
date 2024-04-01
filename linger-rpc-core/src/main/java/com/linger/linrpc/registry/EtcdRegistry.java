@@ -80,7 +80,7 @@ public class EtcdRegistry implements Registry {
     }
 
     @Override
-    public void unRegistry(ServiceMetaInfo serviceMetaInfo) {
+    public void unRegister(ServiceMetaInfo serviceMetaInfo) {
         String registry = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
         kvClient.delete(ByteSequence.from(ETCD_ROOT_PATH +
                 serviceMetaInfo.getServiceNodeKey(), StandardCharsets.UTF_8));
@@ -93,7 +93,7 @@ public class EtcdRegistry implements Registry {
 
         // 优先从缓存获取服务
         List<ServiceMetaInfo> cachedServiceMetaInfoList = registryServiceCache.readCache();
-        if (cachedServiceMetaInfoList != null) {
+        if (CollUtil.isNotEmpty(cachedServiceMetaInfoList)) {
             return cachedServiceMetaInfoList;
         }
 
@@ -111,8 +111,8 @@ public class EtcdRegistry implements Registry {
             // 解析服务信息
             List<ServiceMetaInfo> serviceMetaInfoList = keyValues.stream()
                     .map(keyValue -> {
-                        String key = keyValue.getValue().toString(StandardCharsets.UTF_8);
-                        //监听 key 的变化
+                        String key = keyValue.getKey().toString(StandardCharsets.UTF_8);
+                        // 监听 key 的变化
                         watch(key);
                         String value = keyValue.getValue().toString(StandardCharsets.UTF_8);
                         return JSONUtil.toBean(value, ServiceMetaInfo.class);

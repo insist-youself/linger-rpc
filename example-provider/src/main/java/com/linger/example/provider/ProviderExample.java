@@ -11,6 +11,7 @@ import com.linger.linrpc.registry.Registry;
 import com.linger.linrpc.registry.RegistryFactory;
 import com.linger.linrpc.server.HttpServer;
 import com.linger.linrpc.server.VertxHttpServer;
+import com.linger.linrpc.server.tcp.VertxTcpServer;
 
 /**
  * 服务提供者示例
@@ -43,7 +44,11 @@ public class ProviderExample {
         }
 
         // 启动 web 服务
-        HttpServer httpServer = new VertxHttpServer();
-        httpServer.doStart(RpcApplication.getRpcConfig().getServerPort());
+        //HttpServer httpServer = new VertxHttpServer();
+        //httpServer.doStart(RpcApplication.getRpcConfig().getServerPort());
+
+        // 启动 TCP 服务
+        VertxTcpServer vertxTcpServer = new VertxTcpServer();
+        vertxTcpServer.doStart(8081);
     }
 }

@@ -1,0 +1,2 @@
+no=com.linger.linrpc.fault.retry.NoRetryStrategy
+fixedInterval=com.linger.linrpc.fault.retry.FixedIntervalRetryStrategy

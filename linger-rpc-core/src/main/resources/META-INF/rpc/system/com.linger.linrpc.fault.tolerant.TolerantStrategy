@@ -1,0 +1,4 @@
+failBack=com.linger.linrpc.fault.tolerant.FailBackTolerantStrategy
+failFast=com.linger.linrpc.fault.tolerant.FailFastTolerantStrategy
+failOver=com.linger.linrpc.fault.tolerant.FailOverTolerantStrategy
+failSafe=com.linger.linrpc.fault.tolerant.FailSafeTolerantStrategy

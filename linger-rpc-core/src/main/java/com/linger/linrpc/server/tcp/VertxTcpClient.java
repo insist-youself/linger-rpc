@@ -14,6 +14,8 @@ import io.vertx.core.net.NetSocket;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 /**
@@ -23,43 +25,16 @@ import java.util.concurrent.ExecutionException;
  * @date 2024/3/30 22:27
  */
 public class VertxTcpClient {
-
-//    public void start() {
-//        // 创建 Vert.x 实例
-//        Vertx vertx = Vertx.vertx();
-//
-//        vertx.createNetClient().connect(8888, "localhost", result -> {
-//            if (result.succeeded()) {
-//                System.out.println("Connected to TCP server");
-//                NetSocket socket = result.result();
-//                // 发送数据
-//                //socket.write("Hello, server!");
-//                for (int i = 0; i < 1000; i++) {
-//                    // 发送数据
-//                    Buffer buffer = Buffer.buffer();
-//                    String str = "Hello, server!Hello, server!Hello, server!Hello, server!";
-//
-//                    buffer.appendInt(0);
-//                    buffer.appendInt(str.getBytes().length);
-//                    buffer.appendBytes(str.getBytes());
-//                    socket.write(buffer);
-//                }
-//                // 接收响应
-//                socket.handler(buffer -> {
-//                    System.out.println("Received response from server:" + buffer.toString());
-//                });
-//            } else {
-//                System.out.println("Failed to connect to TCP server");
-//            }
-//        });
-//    }
-//
-//    public static void main(String[] args) {
-//        new VertxTcpClient().start();
-//    }
-
-    public static RpcResponse doRequest(RpcRequest rpcRequest, ServiceMetaInfo serviceMetaInfo)
-            throws InterruptedException, ExecutionException {
+    /**
+     * 发送请求
+     *
+     * @param rpcRequest
+     * @param serviceMetaInfo
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     */
+    public static RpcResponse doRequest(RpcRequest rpcRequest, ServiceMetaInfo serviceMetaInfo) throws InterruptedException, ExecutionException, TimeoutException {
         // 发送 TCP 请求
         Vertx vertx = Vertx.vertx();
         NetClient netClient = vertx.createNetClient();
@@ -67,7 +42,7 @@ public class VertxTcpClient {
         netClient.connect(serviceMetaInfo.getServicePort(), serviceMetaInfo.getServiceHost(),
                 result -> {
                     if (!result.succeeded()) {
-                        System.out.println("Connected to TCP server");
+                        System.err.println("Failed to connect to TCP server");
                         return;
                     }
                     NetSocket socket = result.result();
@@ -83,6 +58,7 @@ public class VertxTcpClient {
                     header.setRequestId(IdUtil.getSnowflakeNextId());
                     protocolMessage.setHeader(header);
                     protocolMessage.setBody(rpcRequest);
+
                     // 编码请求
                     try {
                         Buffer encodeBuffer = ProtocolMessageEncoder.encode(protocolMessage);
@@ -92,20 +68,23 @@ public class VertxTcpClient {
                     }
 
                     // 接收响应
-                    TcpBufferHandlerWrapper bufferHandlerWrapper = new TcpBufferHandlerWrapper
-                    (buffer -> {
-                        try {
-                            ProtocolMessage<RpcResponse> rpcResponseProtocolMessage =
-                                    (ProtocolMessage<RpcResponse>) ProtocolMessageDecoder.decode(buffer);
-                            responseFuture.complete(rpcResponseProtocolMessage.getBody());
-                        } catch (IOException e) {
-                            throw new RuntimeException("协议消息解码错误");
-                        }
-                    });
+                    TcpBufferHandlerWrapper bufferHandlerWrapper = new TcpBufferHandlerWrapper(
+                            buffer -> {
+                                try {
+                                    ProtocolMessage<RpcResponse> rpcResponseProtocolMessage =
+                                            (ProtocolMessage<RpcResponse>) ProtocolMessageDecoder.decode(buffer);
+                                    responseFuture.complete(rpcResponseProtocolMessage.getBody());
+                                } catch (IOException e) {
+                                    throw new RuntimeException("协议消息解码错误");
+                                }
+                            }
+                    );
                     socket.handler(bufferHandlerWrapper);
+
                 });
 
-        RpcResponse rpcResponse = responseFuture.get();
+        RpcResponse rpcResponse = responseFuture.get(2, TimeUnit.SECONDS);
+
         // 记得关闭连接
         netClient.close();
         return rpcResponse;

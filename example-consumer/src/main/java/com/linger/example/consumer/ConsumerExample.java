@@ -2,6 +2,7 @@ package com.linger.example.consumer;
 
 import com.linger.example.common.model.User;
 import com.linger.example.common.service.UserService;
+import com.linger.linrpc.bootstrap.ConsumerBootstrap;
 import com.linger.linrpc.config.RpcConfig;
 import com.linger.linrpc.proxy.ServiceProxyFactory;
 import com.linger.linrpc.utils.ConfigUtils;
@@ -16,6 +17,9 @@ public class ConsumerExample {
     public static void main(String[] args) {
 //        RpcConfig rpc = ConfigUtils.loadConfig(RpcConfig.class, "rpc");
 //        System.out.println(rpc);
+        // 服务提供者初始化
+        ConsumerBootstrap.init();
+
         // 获取代理
         UserService userService = ServiceProxyFactory.getProxy(UserService.class);
         User user = new User();

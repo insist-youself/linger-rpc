@@ -1,0 +1,3 @@
+roundRobin=com.linger.linrpc.loadbalancer.RoundRobinLoadBalancer
+random=com.linger.linrpc.loadbalancer.RandomLoadBalancer
+consistentHash=com.linger.linrpc.loadbalancer.ConsistentHashLoadBalancer

@@ -6,5 +6,14 @@ package com.linger.linrpc.loadbalancer;
  * @author linger
  * @date 2024/4/1 16:19
  */
-public class LoadBalancerKeys {
+public interface LoadBalancerKeys {
+
+    /**
+     * 轮询
+     */
+    String ROUND_ROBIN = "roundRobin";
+
+    String RANDOM = "random";
+
+    String CONSISTENT_HASH = "consistentHash";
 }

@@ -7,7 +7,7 @@ import io.vertx.core.buffer.Buffer;
 import java.io.IOException;
 
 /**
- * 协议消息译码器
+ * 协议消息编码器
  *
  * @author linger
  * @date 2024/3/31 15:38
@@ -26,7 +26,7 @@ public class ProtocolMessageEncoder {
             return Buffer.buffer();
         }
         ProtocolMessage.Header header = protocolMessage.getHeader();
-        // 依次向缓冲区写入字节
+        // 依次向缓冲区写入字节（TCP协议中的各种相关数据）
         Buffer buffer = Buffer.buffer();
         buffer.appendByte(header.getMagic());
         buffer.appendByte(header.getVersion());
